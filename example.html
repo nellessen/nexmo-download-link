@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Nexmo Messaging Proxy Example</title>
+        <meta name="description" content="This is an example for the Nexmo Messaging Proxy">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        
+        <h1>Nexmo Messaging Proxy Example</h1>
+        <p>
+            This is an example page showing how the API works. To test this page start the proxy with the following command (note that in this example sandbox API credentials for Nexmo are used):
+        </p>
+        <p>
+            <code>
+                NEXMO_API_KEY="SD_98659" NEXMO_API_SECRET="PS_34729" NEXMO_DOMAIN="rest-sandbox.nexmo.com" NEXMO_SSL=1 SENDER="Example Sender " MESSAGE="This is an example message" python app.py
+            </code>
+        </p>
+        <form id="nexmo-form">
+            <label for="server">Server</label>
+            <input type="text" id="server" value="http://localhost:8888"><br>
+            <label for="server">Receiver</label>
+            <input type="text" id="receiver" value="0176 12345678"><br>
+            <button id="submit-message">Send Message</button>
+            <button id="submit-validation">Validate Number</button>
+        </form>
+        
+        <div style="height: 35px; margin: 1em 0 0 0 ;"><div id="loadingIndicator" style="display: none;">
+            <img src="http://www.mytreedb.com/uploads/mytreedb/loader/ajax_loader_blue_32.gif" alt="loading...">
+        </div></div>
+        
+        <div>
+            <h3>Request</h3>
+            <pre class="prettyprint" id="request-code" style="display: inline-block; border:1px dashed grey; padding: 1em; min-height: 4em; min-width: 30em;"></pre>
+        </div>
+        
+        <div>
+            <h3>Response</h3>
+            <pre class="prettyprint" id="response-code" style="display: inline-block; border:1px dashed grey; padding: 1em; min-height: 4em; min-width: 30em;"></pre>
+        </div>
+        
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script>
+	        // Prevent form submission
+	        $("#nexmo-form").submit(function(){
+	        	return false;
+	        });
+            
+            // Define callback when clicking Send Message.
+            $("#submit-message").click(function(){
+                var receiver = $("#receiver").val();
+                var url = $("#server").val() + '/message/';
+                var request_output = "Requesting " + url + "<br>";
+                var settings = {
+                    url: url,
+                    dataType: 'jsonp',
+                    timeout : 5000
+                };
+                if (receiver) {
+                    settings['data'] = { receiver:  receiver};
+                    request_output += "receiver: " + receiver + "<br>";
+                }
+                else {
+                    request_output += "No receiver<br>";
+                }
+
+                $( "#loadingIndicator" ).show();
+                $("#request-code").html(request_output);
+                
+                $.ajax(settings).done(function(data, textStatus, jqXHR) {
+                    output = JSON.stringify(data) + "<br>";
+                    $("#response-code").html(output);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    output = "Error: " + errorThrown + "<br>";
+                    $("#response-code").html(output);
+                }).always(function() { $( "#loadingIndicator" ).hide(); });
+            });
+            
+            // Define callback when clicking Validate Number.
+            $("#submit-validation").click(function(){
+                var receiver = $("#receiver").val();
+                var url = $("#server").val() + '/validate_number/';
+                var request_output = "Requesting " + url + "<br>";
+                var settings = {
+                    url: url,
+                    dataType: 'jsonp',
+                    timeout : 5000
+                };
+                if (receiver) {
+                    settings['data'] = { number:  receiver};
+                    request_output += "number: " + receiver + "<br>";
+                }
+                else {
+                    request_output += "No number<br>";
+                }
+
+                $( "#loadingIndicator" ).show();
+                $("#request-code").html(request_output);
+                
+                $.ajax(settings).done(function(data, textStatus, jqXHR) {
+                    output = JSON.stringify(data) + "<br>";
+                    $("#response-code").html(output);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    output = "Error: " + errorThrown + "<br>";
+                    $("#response-code").html(output);
+                }).always(function() { $( "#loadingIndicator" ).hide(); });
+            });
+        </script>
+    </body>
+</html>
